@@ -23,7 +23,7 @@ impl Fzf {
             .stdout(Stdio::piped())
             .spawn()
         {
-            Err(why) => panic!("couldn't spawn fzf: {}", why),
+            Err(why) => Err(anyhow!(EasyGHError::FzfSpawnError)),
             Ok(process) => Ok(Fzf(process)),
         }
     }
@@ -39,7 +39,7 @@ impl Fzf {
     pub fn read_from_stdout(&mut self) -> Result<String> {
         let mut s = String::new();
         if let Err(why) = self.0.stdout.as_mut().unwrap().read_to_string(&mut s) {
-            panic!("couldn't wait on fzf: {}", why)
+            Err(anyhow!(EasyGHError::FzfReadError))?;
         }
         Ok(s)
     }
